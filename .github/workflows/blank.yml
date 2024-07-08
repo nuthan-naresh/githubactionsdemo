@@ -1,4 +1,4 @@
-name: Dispatch Agent Build Workflow
+name: Dispatch Agent Build test
 
 on:
   push:
