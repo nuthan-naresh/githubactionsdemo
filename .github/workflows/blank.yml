@@ -1,0 +1,44 @@
+name: Dispatch Agent Build Workflow
+
+on:
+  push:
+    branches: [ "GIT_Build" ]
+  
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    id-token: write
+jobs:
+
+  build:
+    runs-on: arc-india-blr-development-windows
+    
+    steps:
+      - uses: actions/checkout@v3
+      name: Dispatch Agent Build Workflow
+
+on:
+  push:
+    branches: [ "main" ]
+  
+    workflow_dispatch:
+
+permissions:
+    contents: read
+    id-token: write
+jobs:
+
+  build:
+    runs-on: arc-india-blr-development-windows
+    
+    steps:
+      - uses: actions/checkout@v3
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::339713188249:role/githubactionsrole
+          role-skip-session-tagging: true
+          role-duration-seconds: 900
+          aws-region: us-east-2
+
