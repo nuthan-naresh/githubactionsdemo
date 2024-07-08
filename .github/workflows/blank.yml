@@ -2,24 +2,6 @@ name: Dispatch Agent Build Workflow
 
 on:
   push:
-    branches: [ "GIT_Build" ]
-  
-    workflow_dispatch:
-
-permissions:
-    contents: read
-    id-token: write
-jobs:
-
-  build:
-    runs-on: arc-india-blr-development-windows
-    
-    steps:
-      - uses: actions/checkout@v3
-      name: Dispatch Agent Build Workflow
-
-on:
-  push:
     branches: [ "main" ]
   
     workflow_dispatch:
