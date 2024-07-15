@@ -14,15 +14,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     
+    permissions:
+      contents: write
     steps:
-      - uses: actions/checkout@v3
-      - name: configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          role-to-assume: arn:aws:iam::339713188249:role/githubactionsrole
-          role-skip-session-tagging: true
-          role-duration-seconds: 900
-          aws-region: us-east-2
-      - name: Deploy static site to S3 bucket
-        run: aws s3 sync ./ s3://githubactions-agent-bucket --delete
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: '0'
+
+    - name: Bump version and push tag
+      uses: githubactionsdemo/github-tag-action@v1 # Don't use @master or @v1 unless you're happy to test the latest version
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
+        WITH_V: false
 
