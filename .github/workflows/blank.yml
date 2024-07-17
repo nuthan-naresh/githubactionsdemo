@@ -16,30 +16,26 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-      with:
-        fetch-depth: '0'
-
-    - name: Extract tag name
-      id: tag
-      uses: actions/github-script@0.2.0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          return context.payload.ref.replace(/\/refs\/tags\//, '');
-    - name: Echo
-      run: echo ${{ steps.tag.outputs.result }}
-      
-    - name: Github Tag name
+    - name: Extract version numbers
+      id: extract_version
       run: |
-        echo "Tag name from GitHub_Ref_Name: $GITHUB_RUN-NUMBER"
-        echo "Tag Name from Github_Ref_Name: ${{ steps.bump_version.outputs.version }}"
+          VERSION=$(git describe --tags)
+          echo "Full version: $VERSION"
 
+          # Remove the leading 'v' if it exists
+          VERSION=${VERSION#v}
+          
+          # Extract major, minor, and patch versions
+          MAJOR=$(echo $VERSION | cut -d. -f1)
+          MINOR=$(echo $VERSION | cut -d. -f2)
+          PATCH=$(echo $VERSION | cut -d. -f3)
 
-    - name: Determine version type
-      id: bump_version
+          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
+          echo "MINOR=$MINOR" >> $GITHUB_ENV
+          echo "PATCH=$PATCH" >> $GITHUB_ENV
+
+    - name: Output version numbers
       run: |
-          export MAJOR: ${{ steps.branchVersion.outputs.major }}
-          export MINOR: ${{ steps.branchVersion.outputs.minor }}
-          export PATCH: ${{ steps.branchVersion.outputs.patch }}
-          MANIFEST_SAFE_VERSION_STRING: ${{ steps.branchVersion.outputs.manifestSafeVersionString }}
-          "echo major: $MAJOR minor: $MINOR patch: $PATCH manifestSafeVersionString: $MANIFEST_SAFE_VERSION_STRING"
+          echo "Major version: $MAJOR"
+          echo "Minor version: $MINOR"
+          echo "Patch version: $PATCH"
