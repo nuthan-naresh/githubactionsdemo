@@ -1,4 +1,4 @@
-name: Get Latest Release Tag
+name: Debug GitHub Token
 
 on:
   push:
@@ -6,15 +6,27 @@ on:
       - main
 
 jobs:
-  get-version:
+  debug-token:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Verify GitHub Token
+        run: |
+          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
+            echo "GITHUB_TOKEN is not set."
+            exit 1
+          fi
+          echo "GITHUB_TOKEN is set."
+
       - name: Fetch latest release tag
         run: |
+          echo "Fetching latest release tag..."
           response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-          https://api.github.com/repos/${{ github.repository }}/releases/latest)
+            https://api.github.com/repos/${{ github.repository }}/releases/latest)
           echo "$response" > response.json
+          jq . response.json
           tag_name=$(jq -r '.tag_name' response.json)
           echo "Latest release tag: $tag_name"
-      # Add more steps as needed
