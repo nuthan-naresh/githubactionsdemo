@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
-      - uses: nuthan-naresh/githubactionsdemo@v1
+      - uses: nuthan-naresh/githubactionsdemo@v2
         id: branchVersion
       - name: Dump the version info
         env:
