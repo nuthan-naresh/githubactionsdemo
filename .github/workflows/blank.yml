@@ -19,8 +19,6 @@ jobs:
     - name: Extract version numbers
       id: extract_version
       run: |
-          VERSION=$(git describe --tags)
-          echo "Full version: $VERSION"
 
           # Remove the leading 'v' if it exists
           VERSION=${VERSION#v}
