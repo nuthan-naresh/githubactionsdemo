@@ -2,9 +2,9 @@ name: Dispatch Agent Build test
 
 on:
   push:
+    tags: 
+      - '*'
     branches: [ "main" ]
-  
-    workflow_demo:
 
 permissions:
     contents: read
