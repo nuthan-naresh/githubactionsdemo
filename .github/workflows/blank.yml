@@ -45,3 +45,9 @@ jobs:
       run: |
         echo "Tag name from GitHub_Ref_Name: $GITHUB_RUN-NUMBER"
         echo "Tag Name from Github_Ref_Name: ${{github.event.release.tag_name}}"
+    - name: Dump env
+      run: env | sort
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
