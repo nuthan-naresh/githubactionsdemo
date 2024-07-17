@@ -20,9 +20,12 @@ jobs:
       - name: Install GitHub CLI
         run: sudo snap install gh
 
-      - name: Authenticate GitHub CLI
+      - name: Configure GitHub CLI authentication
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
+          export XDG_CONFIG_HOME=/home/runner/work/_temp
+          echo "${GH_TOKEN}" | gh auth login --with-token
           gh auth setup-git
       - name: Get the latest release tag
         id: get_latest_release
