@@ -18,7 +18,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Set up GitHub CLI
-        uses: actions/setup-gh@v2
+        uses: mattdavis0351/actions-gh-cli@v2
       - name: Authenticate GitHub CLI
         run: gh auth login --with-token < ${{ secrets.GITHUB_TOKEN }}
       - name: Get the latest release tag
