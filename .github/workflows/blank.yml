@@ -18,7 +18,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Set up GitHub CLI
-        uses: actions4gh/setup-gh@v2
+        uses: actions/setup-gh@v2
       - name: Get the latest release tag
         id: get_latest_release
         run: |
