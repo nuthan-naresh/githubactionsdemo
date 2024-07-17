@@ -3,8 +3,8 @@ name: Dispatch Agent Build test
 on:
   push:
     branches: [ "main" ]
-  
-    workflow_demo:
+    tags:
+      - 'v*.*.*'
 
 permissions:
     contents: read
