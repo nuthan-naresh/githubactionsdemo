@@ -33,9 +33,7 @@ jobs:
       run: |
         echo "Tag name from GitHub_Ref_Name: $GITHUB_RUN-NUMBER"
         echo "Tag Name from Github_Ref_Name: ${{ steps.bump_version.outputs.version }}"
-    - name: Get current version latest
-      id: get_version
-      run: echo ::set-output name=version::$(git describe --abbrev=0 --tags)
+
 
     - name: Determine version type
       id: bump_version
