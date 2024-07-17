@@ -15,25 +15,41 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-    - uses: actions/checkout@v4
-    - name: Extract version numbers
-      id: extract_version
-      run: |
+      - name: Check out repository
+        uses: actions/checkout@v2
 
-          # Remove the leading 'v' if it exists
-          VERSION=${VERSION#v}
-          
-          # Extract major, minor, and patch versions
-          MAJOR=$(echo $VERSION | cut -d. -f1)
-          MINOR=$(echo $VERSION | cut -d. -f2)
-          PATCH=$(echo $VERSION | cut -d. -f3)
+      - name: Set up GitHub CLI
+        uses: actions/setup-gh@v2
 
-          echo "MAJOR=$MAJOR" >> $GITHUB_ENV
-          echo "MINOR=$MINOR" >> $GITHUB_ENV
-          echo "PATCH=$PATCH" >> $GITHUB_ENV
+      - name: Get the latest release tag
+        id: get_latest_release
+        run: |
+          latest_release=$(gh release view --json tagName -q .tagName)
+          echo "Latest release tag: $latest_release"
+          echo "::set-output name=latest_release::$latest_release"
 
-    - name: Output version numbers
-      run: |
-          echo "Major version: $MAJOR"
-          echo "Minor version: $MINOR"
-          echo "Patch version: $PATCH"
+      - name: Extract version numbers
+        id: extract_version
+        run: |
+          version=${{ steps.get_latest_release.outputs.latest_release }}
+          # Assuming the version is in the format v1.2.3
+          if [[ "$version" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            major="${BASH_REMATCH[1]}"
+            minor="${BASH_REMATCH[2]}"
+            patch="${BASH_REMATCH[3]}"
+          else
+            echo "Version format not recognized"
+            exit 1
+          fi
+          echo "Major: $major"
+          echo "Minor: $minor"
+          echo "Patch: $patch"
+          echo "::set-output name=major::$major"
+          echo "::set-output name=minor::$minor"
+          echo "::set-output name=patch::$patch"
+
+      - name: Use the version numbers
+        run: |
+          echo "Major version: ${{ steps.extract_version.outputs.major }}"
+          echo "Minor version: ${{ steps.extract_version.outputs.minor }}"
+          echo "Patch version: ${{ steps.extract_version.outputs.patch }}"
