@@ -45,3 +45,7 @@ jobs:
       with:
         name: ${{ github.ref_name }}
         path: Release
+    - name: Github Tag name
+      run: |
+        echo "Tag name from GitHub_Ref_Name: $GITHUB_REF_NAME"
+        echo: "Tag Name from Github_Ref_Name: ${{github.ref_name}}"
