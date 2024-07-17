@@ -38,28 +38,3 @@ jobs:
           echo "Latest release tag: $latest_release"
           echo "::set-output name=latest_release::$latest_release"
 
-      - name: Extract version numbers
-        id: extract_version
-        run: |
-          version=${{ steps.get_latest_release.outputs.latest_release }}
-          # Assuming the version is in the format v1.2.3
-          if [[ "$version" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
-            major="${BASH_REMATCH[1]}"
-            minor="${BASH_REMATCH[2]}"
-            patch="${BASH_REMATCH[3]}"
-          else
-            echo "Version format not recognized"
-            exit 1
-          fi
-          echo "Major: $major"
-          echo "Minor: $minor"
-          echo "Patch: $patch"
-          echo "::set-output name=major::$major"
-          echo "::set-output name=minor::$minor"
-          echo "::set-output name=patch::$patch"
-
-      - name: Use the version numbers
-        run: |
-          echo "Major version: ${{ steps.extract_version.outputs.major }}"
-          echo "Minor version: ${{ steps.extract_version.outputs.minor }}"
-          echo "Patch version: ${{ steps.extract_version.outputs.patch }}"
