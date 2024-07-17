@@ -36,15 +36,11 @@ jobs:
           return context.payload.ref.replace(/\/refs\/tags\//, '');
     - name: Echo
       run: echo ${{ steps.tag.outputs.result }}
+      
     - name: Get the version
       id: get_version
       run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
       
-    - name: Create tag artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: ${{ github.ref_name }}
-        path: Release
     - name: Github Tag name
       run: |
         echo "Tag name from GitHub_Ref_Name: $GITHUB_RUN-NUMBER"
