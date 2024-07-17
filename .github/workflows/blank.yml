@@ -25,7 +25,8 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           echo "${GH_TOKEN}" | gh auth login --with-token
-          gh config set git_protocol ssh
+          unset GH_TOKEN  # Clear the environment variable
+
       - name: Get the latest release tag
         id: get_latest_release
         run: |
