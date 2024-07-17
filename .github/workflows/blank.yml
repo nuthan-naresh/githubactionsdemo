@@ -1,21 +1,10 @@
-name: Dispatch Agent Build test
+name: Get release branch
+on: create
 
-on:
-  push:
-    tags: 
-      - '*'
-    branches: [ "main" ]
-
-permissions:
-    contents: read
-    id-token: write
 jobs:
-
-  build:
+  get-release:
+    name: Get the release branch version number
     runs-on: ubuntu-latest
-    
-    permissions:
-      contents: write
     steps:
       - uses: actions/checkout@v2
         with:
