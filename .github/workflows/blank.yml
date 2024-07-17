@@ -1,26 +1,50 @@
-name: Dispatch Agent Build test
+name: Get Version Numbers
 
 on:
   push:
-    branches: [ "main" ]
-    tags:
-      - 'v*.*.*'
+    branches:
+      - main
 
-permissions:
-    contents: write
-    id-token: write
 jobs:
-  extract-version:
+  get-version:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Check out repository
         uses: actions/checkout@v2
-      - uses: nuthan-naresh/githubactionsdemo@v2
-        id: branchVersion
-      - name: Dump the version info
-        env:
-          MAJOR: ${{ steps.branchVersion.outputs.major }}
-          MINOR: ${{ steps.branchVersion.outputs.minor }}
-          PATCH: ${{ steps.branchVersion.outputs.patch }}
-          MANIFEST_SAFE_VERSION_STRING: ${{ steps.branchVersion.outputs.manifestSafeVersionString }}
-        run: "echo major: $MAJOR minor: $MINOR patch: $PATCH manifestSafeVersionString: $MANIFEST_SAFE_VERSION_STRING"
+
+      - name: Set up GitHub CLI
+        uses: actions/setup-gh@v2
+
+      - name: Get the latest release tag
+        id: get_latest_release
+        run: |
+          latest_release=$(gh release view --json tagName -q .tagName)
+          echo "Latest release tag: $latest_release"
+          echo "::set-output name=latest_release::$latest_release"
+
+      - name: Extract version numbers
+        id: extract_version
+        run: |
+          version=${{ steps.get_latest_release.outputs.latest_release }}
+          # Assuming the version is in the format v1.2.3
+          if [[ "$version" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+            major="${BASH_REMATCH[1]}"
+            minor="${BASH_REMATCH[2]}"
+            patch="${BASH_REMATCH[3]}"
+          else
+            echo "Version format not recognized"
+            exit 1
+          fi
+          echo "Major: $major"
+          echo "Minor: $minor"
+          echo "Patch: $patch"
+          echo "::set-output name=major::$major"
+          echo "::set-output name=minor::$minor"
+          echo "::set-output name=patch::$patch"
+
+      - name: Use the version numbers
+        run: |
+          echo "Major version: ${{ steps.extract_version.outputs.major }}"
+          echo "Minor version: ${{ steps.extract_version.outputs.minor }}"
+          echo "Patch version: ${{ steps.extract_version.outputs.patch }}"
