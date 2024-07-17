@@ -43,7 +43,6 @@ jobs:
       
     - uses: valadas/get-release-branch-version@v1
       id: branchVersion
-    - name: Dump the version info
       env:
         MAJOR: ${{ steps.branchVersion.outputs.major }}
         MINOR: ${{ steps.branchVersion.outputs.minor }}
