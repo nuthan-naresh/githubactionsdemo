@@ -13,8 +13,13 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
-      - name: Set up GitHub CLI
-        uses: actions/setup-gh@v2
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install GitHub CLI
+        run: npm install -g @githubnext/github-cli
 
       - name: Get the latest release tag
         id: get_latest_release
