@@ -54,7 +54,7 @@ jobs:
           echo "::set-output name=minor::$minor"
           echo "::set-output name=patch::$patch"
 
-      - name: Use the version numbers
+      - name: Use the version numbers 
         run: |
           echo "Major version: ${{ steps.extract_version.outputs.major }}"
           echo "Minor version: ${{ steps.extract_version.outputs.minor }}"
