@@ -17,35 +17,15 @@ jobs:
     permissions:
       contents: write
     steps:
-    - uses: actions/checkout@v4
-      with:
-        fetch-depth: '0'
-
-    - name: Bump version and push tag
-      uses: anothrNick/github-tag-action@v1 # Don't use @master or @v1 unless  you're happy to test the latest version
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # if you don't want to set write permissions use a PAT token
-        WITH_V: true
-
-    - name: Extract tag name
-      id: tag
-      uses: actions/github-script@0.2.0
-      with:
-        github-token: ${{ secrets.GITHUB_TOKEN }}
-        script: |
-          return context.payload.ref.replace(/\/refs\/tags\//, '');
-    - name: Echo
-      run: echo ${{ steps.tag.outputs.result }}
-      
-    - name: Get the version
-      id: get_version
-      run: echo ::set-output name=VERSION::${GITHUB_REF/refs\/tags\//}
-      
-    - uses: valadas/get-release-branch-version@v1
-      id: branchVersion
-      env:
-        MAJOR: ${{ steps.branchVersion.outputs.major }}
-        MINOR: ${{ steps.branchVersion.outputs.minor }}
-        PATCH: ${{ steps.branchVersion.outputs.patch }}
-        MANIFEST_SAFE_VERSION_STRING: ${{ steps.branchVersion.outputs.manifestSafeVersionString }}
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 1
+      - uses: valadas/get-release-branch-version@v1
+        id: branchVersion
+      - name: Dump the version info
+        env:
+          MAJOR: ${{ steps.branchVersion.outputs.major }}
+          MINOR: ${{ steps.branchVersion.outputs.minor }}
+          PATCH: ${{ steps.branchVersion.outputs.patch }}
+          MANIFEST_SAFE_VERSION_STRING: ${{ steps.branchVersion.outputs.manifestSafeVersionString }}
         run: "echo major: $MAJOR minor: $MINOR patch: $PATCH manifestSafeVersionString: $MANIFEST_SAFE_VERSION_STRING"
