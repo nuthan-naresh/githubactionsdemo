@@ -10,10 +10,8 @@ permissions:
     contents: write
     id-token: write
 jobs:
-
-  build:
+  extract-version:
     runs-on: ubuntu-latest
-    
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
