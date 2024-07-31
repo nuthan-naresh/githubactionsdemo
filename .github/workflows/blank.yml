@@ -14,47 +14,13 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Install Chocolatey
-      run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force; `
-        [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
-        iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-      shell: powershell
-
-    - name: Check Chocolatey Sources
-      run: |
-        # List all sources
-        choco source list
-      shell: powershell
-
-    - name: Remove Custom Sources
-      run: |
-        # Remove any custom sources
-        choco source remove -n=nexus-udapp
-        # List sources to confirm
-        choco source list
-      shell: powershell
-
-    - name: Add Chocolatey Community Source
-      run: |
-        # Add the official Chocolatey source
-        choco source add -n=chocolatey -s=https://community.chocolatey.org/api/v2/
-        # Enable the official Chocolatey source
-        choco source enable -n=chocolatey
-        # List sources to confirm
-        choco source list
-      shell: powershell
-
-    - name: Search for WiX Package
-      run: |
-        # Search for WiX package to check availability
-        choco search wix
-      shell: powershell
-
     - name: Install WiX Toolset
       run: |
-        # Attempt to install WiX Toolset directly from Chocolatey community repository
-        choco install wix -y --source=https://community.chocolatey.org/api/v2/
+        $wixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311.exe"
+        $wixInstaller = "$env:USERPROFILE\wix311.exe"
+        Invoke-WebRequest -Uri $wixUrl -OutFile $wixInstaller
+        Start-Process -FilePath $wixInstaller -ArgumentList "/silent" -Wait
+        Remove-Item -Path $wixInstaller
       shell: powershell
 
     - name: Verify WiX Toolset Installation
