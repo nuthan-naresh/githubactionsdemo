@@ -1,32 +1,68 @@
-name: Debug GitHub Token
+name: Build WiX Project
 
 on:
   push:
     branches:
       - main
+  pull_request:
 
 jobs:
-  debug-token:
-    runs-on: ubuntu-latest
+  build:
+    runs-on: windows-latest
 
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
+    - name: Checkout repository
+      uses: actions/checkout@v2
 
-      - name: Verify GitHub Token
-        run: |
-          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then
-            echo "GITHUB_TOKEN is not set."
-            exit 1
-          fi
-          echo "GITHUB_TOKEN is set."
+    - name: Install Chocolatey
+      uses: jberezanski/chocolatey-setup@v1
 
-      - name: Fetch latest release tag
-        run: |
-          echo "Fetching latest release tag..."
-          response=$(curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-            https://api.github.com/repos/${{ github.repository }}/releases/latest)
-          echo "$response" > response.json
-          jq . response.json
-          tag_name=$(jq -r '.tag_name' response.json)
-          echo "Latest release tag: $tag_name"
+    - name: Check Chocolatey Sources
+      run: |
+        # List all sources
+        choco source list
+      shell: powershell
+
+    - name: Remove Custom Sources
+      run: |
+        # Remove any custom sources
+        choco source remove -n=nexus-udapp
+        # List sources to confirm
+        choco source list
+      shell: powershell
+
+    - name: Add Chocolatey Community Source
+      run: |
+        # Add the official Chocolatey source
+        choco source add -n=chocolatey -s=https://community.chocolatey.org/api/v2/
+        # Enable the official Chocolatey source
+        choco source enable -n=chocolatey
+        # List sources to confirm
+        choco source list
+      shell: powershell
+
+    - name: Search for WiX Package
+      run: |
+        # Search for WiX package to check availability
+        choco search wix
+      shell: powershell
+
+    - name: Install WiX Toolset
+      run: |
+        # Attempt to install WiX Toolset directly from Chocolatey community repository
+        choco install wix -y --source=https://community.chocolatey.org/api/v2/
+      shell: powershell
+
+    - name: Verify WiX Toolset Installation
+      run: |
+        & "C:\Program Files (x86)\WiX Toolset v3.11\bin\heat.exe" -? 
+        & "C:\Program Files (x86)\WiX Toolset v3.11\bin\candle.exe" -? 
+        & "C:\Program Files (x86)\WiX Toolset v3.11\bin\light.exe" -? 
+      shell: powershell
+
+    - name: Set up MSBuild
+      uses: microsoft/setup-msbuild@v1.0.2
+
+    - name: Build WiX project
+      run: msbuild path\to\your\project.wixproj /p:Configuration=Release
+      shell: powershell
