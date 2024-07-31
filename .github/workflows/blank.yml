@@ -48,6 +48,14 @@ jobs:
           Get-ChildItem -Path $dir -Directory | Where-Object { $_.Name -like "WiX*" } | Select-Object -Property FullName
         }
       shell: powershell
+      continue-on-error: true
+
+    - name: Search Entire File System for WiX
+      run: |
+        Write-Output "Searching entire file system for WiX Toolset"
+        Get-ChildItem -Path "C:\" -Recurse -Directory | Where-Object { $_.Name -like "WiX*" } | Select-Object -Property FullName
+      shell: powershell
+      continue-on-error: true
 
     - name: Set up MSBuild
       uses: microsoft/setup-msbuild@v1.0.2
