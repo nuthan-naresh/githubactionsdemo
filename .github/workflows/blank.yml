@@ -48,14 +48,18 @@ jobs:
           Get-ChildItem -Path $dir -Directory | Where-Object { $_.Name -like "WiX*" } | Select-Object -Property FullName
         }
       shell: powershell
-      continue-on-error: true
 
-    - name: Search Entire File System for WiX
+    - name: Search WiX in Registry
       run: |
-        Write-Output "Searching entire file system for WiX Toolset"
-        Get-ChildItem -Path "C:\" -Recurse -Directory | Where-Object { $_.Name -like "WiX*" } | Select-Object -Property FullName
+        Write-Output "Searching for WiX Toolset in the registry"
+        Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where-Object { $_.DisplayName -like "WiX Toolset*" } | Select-Object -Property DisplayName, InstallLocation
       shell: powershell
-      continue-on-error: true
+
+    - name: Search WiX in Default Log Path
+      run: |
+        Write-Output "Searching for WiX Toolset logs in default log path"
+        Get-ChildItem -Path "$env:USERPROFILE\AppData\Local\Temp" -Filter "MSI*.log" | Select-Object -Property FullName, LastWriteTime
+      shell: powershell
 
     - name: Set up MSBuild
       uses: microsoft/setup-msbuild@v1.0.2
