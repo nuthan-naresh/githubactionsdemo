@@ -14,17 +14,19 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Install WiX Toolset
+    - name: Install WiX Toolset with Logging
       run: |
         $wixUrl = "https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311.exe"
         $wixInstaller = "$env:USERPROFILE\wix311.exe"
         Write-Output "Downloading WiX installer from $wixUrl to $wixInstaller"
         Invoke-WebRequest -Uri $wixUrl -OutFile $wixInstaller
         Write-Output "Running WiX installer"
-        Start-Process -FilePath $wixInstaller -ArgumentList "/silent" -Wait -PassThru | Out-String
+        Start-Process -FilePath $wixInstaller -ArgumentList "/silent" -Wait -NoNewWindow -RedirectStandardOutput "$env:USERPROFILE\wix_install.log" -RedirectStandardError "$env:USERPROFILE\wix_install_err.log"
+        Write-Output "WiX installation completed. Logs:"
+        Get-Content -Path "$env:USERPROFILE\wix_install.log"
+        Get-Content -Path "$env:USERPROFILE\wix_install_err.log"
         Write-Output "Removing WiX installer"
         Remove-Item -Path $wixInstaller
-        Write-Output "WiX installation completed"
       shell: powershell
 
     - name: Verify WiX Toolset Installation Directory
@@ -48,18 +50,14 @@ jobs:
           Get-ChildItem -Path $dir -Directory | Where-Object { $_.Name -like "WiX*" } | Select-Object -Property FullName
         }
       shell: powershell
+      continue-on-error: true
 
-    - name: Search WiX in Registry
+    - name: Search Entire File System for WiX Executables
       run: |
-        Write-Output "Searching for WiX Toolset in the registry"
-        Get-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\*" | Where-Object { $_.DisplayName -like "WiX Toolset*" } | Select-Object -Property DisplayName, InstallLocation
+        Write-Output "Searching entire file system for WiX Toolset executables"
+        Get-ChildItem -Path "C:\" -Recurse -Include "heat.exe", "candle.exe", "light.exe" -ErrorAction SilentlyContinue
       shell: powershell
-
-    - name: Search WiX in Default Log Path
-      run: |
-        Write-Output "Searching for WiX Toolset logs in default log path"
-        Get-ChildItem -Path "$env:USERPROFILE\AppData\Local\Temp" -Filter "MSI*.log" | Select-Object -Property FullName, LastWriteTime
-      shell: powershell
+      continue-on-error: true
 
     - name: Set up MSBuild
       uses: microsoft/setup-msbuild@v1.0.2
